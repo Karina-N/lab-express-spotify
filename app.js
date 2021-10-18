@@ -29,20 +29,34 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-app.get("/artist-search/", (req, res) => {
+app.get("/artist-search", (req, res) => {
+  const currentPage = req.query.page ? parseInt(req.query.page) : 1;
+
+  // let  currentPage = req.query.page || 0;
+  // currentPage = parseInt(currentPage)
+
+  const paginationData = {
+    limit: 20,
+    offset: currentPage * 20,
+  };
+
+  const linkPrev = `?artist=${req.query.artist}&page=${currentPage - 1}`;
+  const linkNext = `?artist=${req.query.artist}&page=${currentPage + 1}`;
+
   spotifyApi
-    .searchArtists(req.query.artist)
+    .searchArtists(req.query.artist, { limit: paginationData.limit, offset: paginationData.offset })
     .then((data) => {
-      //   console.log("The received data from the API: ", data.body);
-      // ----> 'HERE WHAT WE WANT TO DO AFTER RECEIVING THE DATA FROM THE API'
-      //   console.log(data.body.artists.items[0].images[1].url);
+      console.log("CURRENT PAGE", currentPage);
+      console.log("QUERY", req.query);
+      //console.log("The received data from the API: ", data.body);
+
       const filteredArtistsArr = data.body.artists.items.filter((elm) => {
         return req.query.artist ? elm.name.toLowerCase().includes(req.query.artist.toLowerCase()) : true;
       });
-      //   console.log("FILTERED", filteredArtistsArr[0]);
-      //   console.log("FILTERED", filteredArtistsArr[0].images[2].url);
+      // console.log("FILTERED", filteredArtistsArr);
+      // console.log("FILTERED", filteredArtistsArr[0].images[2].url);
 
-      res.render("artist-search-results", { filteredArtistsArr });
+      res.render("artist-search-results", { filteredArtistsArr, linkPrev, linkNext, currentPage });
     })
     .catch((err) => console.log("The error while searching artists occurred: ", err));
 });
@@ -56,7 +70,7 @@ app.get("/albums/:artistId", (req, res, next) => {
         artist: data.body.items[0].artists[0].name,
         artistId: data.body.items[0].artists[0].id,
       };
-      console.log("ALBUMS ARRAY", albumData.albumsArray[0].id);
+      // console.log("ALBUMS ARRAY", albumData.albumsArray);
       res.render("albums", albumData);
     })
     .catch((err) => console.log("error occured while searching for albums", err));
@@ -76,4 +90,4 @@ app.get("/albums/:artistId/:albumId", (req, res, next) => {
     .catch((err) => console.log("error looking for specific album", err));
 });
 
-app.listen(3000, () => console.log("My Spotify project running on port 3000 🎧 🥁 🎸 🔊"));
+app.listen(3005, () => console.log("My Spotify project running on port 3005 🎧 🥁 🎸 🔊"));

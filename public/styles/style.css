@@ -113,3 +113,18 @@
   height: 30px;
   margin: 5px 0;
 }
+
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 40px;
+}
+
+.pagination-buttons a {
+  color: black;
+  padding: 0 20px;
+}
+
+.pagination-buttons a:hover {
+  text-decoration: none;
+}
